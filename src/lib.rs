@@ -61,7 +61,6 @@ pub struct OverrideRpcConfig {
     pub eth_send_raw_transaction: Option<RpcConfig>,
 }
 
-// Clinet for making intercanister calls to evm_rpc_canister
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EvmRpcClient<L: Sink> {
     caller_service: CallerService,
@@ -251,21 +250,6 @@ impl<L: Sink> EvmRpcClientBuilder<L> {
             max_num_retries: DEFAULT_MAX_NUM_RETRIES,
         }
     }
-
-    // pub fn with_runtime<OtherRuntime: Runtime>(
-    //     self,
-    //     runtime: OtherRuntime,
-    // ) -> EvmRpcClientBuilder<OtherRuntime, L> {
-    //     EvmRpcClientBuilder {
-    //         runtime,
-    //         logger: self.logger,
-    //         providers: self.providers,
-    //         evm_canister_id: self.evm_canister_id,
-    //         override_rpc_config: self.override_rpc_config,
-    //         min_attached_cycles: self.min_attached_cycles,
-    //         max_num_retries: self.max_num_retries,
-    //     }
-    // }
 
     pub fn with_providers(mut self, providers: RpcServices) -> Self {
         self.providers = providers;
