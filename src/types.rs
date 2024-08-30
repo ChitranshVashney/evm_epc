@@ -59,36 +59,19 @@ pub mod candid {
 
     #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, CandidType)]
     pub struct LogEntry {
-        /// The address from which this log originated.
         pub address: String,
-        /// Array of 0 to 4 32-byte DATA elements of indexed log arguments.
-        /// In solidity: The first topic is the event signature hash (e.g. Deposit(address,bytes32,uint256)),
-        /// unless you declared the event with the anonymous specifier.
         pub topics: Vec<String>,
-        /// Contains one or more 32-byte non-indexed log arguments.
         pub data: String,
-        /// The block number in which this log appeared.
-        /// None if the block is pending.
         #[serde(rename = "blockNumber")]
         pub block_number: Option<Nat>,
-        /// 32-byte hash of the transaction from which this log was created.
-        /// None if the transaction is still pending.
         #[serde(rename = "transactionHash")]
         pub transaction_hash: Option<String>,
-        /// Integer of the transaction's position within the block the log was created from.
-        /// None if the transaction is still pending.
         #[serde(rename = "transactionIndex")]
         pub transaction_index: Option<Nat>,
-        /// 32-byte hash of the block in which this log appeared.
-        /// None if the block is pending.
         #[serde(rename = "blockHash")]
         pub block_hash: Option<String>,
-        /// Integer of the log index position in the block.
-        /// None if the log is pending.
         #[serde(rename = "logIndex")]
         pub log_index: Option<Nat>,
-        /// "true" when the log was removed due to a chain reorganization.
-        /// "false" if it is a valid log.
         #[serde(default)]
         pub removed: bool,
     }
@@ -105,40 +88,23 @@ pub mod candid {
 
     #[derive(Clone, Debug, PartialEq, Eq, CandidType, Deserialize)]
     pub struct FeeHistoryArgs {
-        /// Number of blocks in the requested range.
-        /// Typically, providers request this to be between 1 and 1024.
         #[serde(rename = "blockCount")]
         pub block_count: u128,
-
-        /// Highest block of the requested range.
-        /// Integer block number, or "latest" for the last mined block or "pending", "earliest" for not yet mined transactions.
         #[serde(rename = "newestBlock")]
         pub newest_block: BlockTag,
-
-        /// A monotonically increasing list of percentile values between 0 and 100.
-        /// For each block in the requested range, the transactions will be sorted in ascending order
-        /// by effective tip per gas and the corresponding effective tip for the percentile
-        /// will be determined, accounting for gas consumed.
         #[serde(rename = "rewardPercentiles")]
         pub reward_percentiles: Option<Vec<u8>>,
     }
 
     #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, CandidType)]
     pub struct FeeHistory {
-        /// Lowest number block of the returned range.
         #[serde(rename = "oldestBlock")]
         pub oldest_block: Nat,
-        /// An array of block base fees per gas.
-        /// This includes the next block after the newest of the returned range,
-        /// because this value can be derived from the newest block.
-        /// Zeroes are returned for pre-EIP-1559 blocks.
         #[serde(rename = "baseFeePerGas")]
         pub base_fee_per_gas: Vec<Nat>,
-        /// An array of block gas used ratios (gasUsed / gasLimit).
         #[serde(default)]
         #[serde(rename = "gasUsedRatio")]
         pub gas_used_ratio: Vec<f64>,
-        /// A two-dimensional array of effective priority fees per gas at the requested block percentiles.
         pub reward: Vec<Vec<Nat>>,
     }
 
@@ -169,9 +135,7 @@ pub mod candid {
 
     #[derive(Clone, Debug, Eq, PartialEq, CandidType, Deserialize)]
     pub struct GetTransactionCountArgs {
-        /// The address for which the transaction count is requested.
         pub address: String,
-        /// Integer block number, or "latest" for the last mined block or "pending", "earliest" for not yet mined transactions.
         pub block: BlockTag,
     }
 
@@ -234,15 +198,11 @@ pub mod candid {
 
     #[derive(Clone, Error, Debug, PartialEq, Eq, PartialOrd, Ord, CandidType, Deserialize)]
     pub enum HttpOutcallError {
-        /// Error from the IC system API.
         #[error("IC error (code: {code:?}): {message}")]
         IcError {
             code: RejectionCode,
             message: String,
         },
-        /// Response is not a valid JSON-RPC response,
-        /// which means that the response was not successful (status other than 2xx)
-        /// or that the response body could not be deserialized into a JSON-RPC response.
         #[error("Invalid HTTP JSON-RPC response: status {status}, body: {body}, parsing error: {parsing_error:?}")]
         InvalidHttpJsonRpcResponse {
             status: u16,
